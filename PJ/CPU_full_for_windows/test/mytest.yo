@@ -1,0 +1,31 @@
+                            | # extra test
+                            | # by GodKe
+                            |
+0x000:                      |   .pos 0          
+0x000: 30f60000000000000000 | 	irmovq value1, %rsi  	# set values
+0x00a: 30f70000000000000000 |   irmovq value2, %rdi     # need to be zero
+
+0x014: e067                 |   cmpq %rsi, %rdi         # compare values
+0x016: 712500000000000000   |   jle next stage          # value1 > value2
+0x01f: 2060                 |   rrmovq %rsi, %rax       # exchange
+0x021: 2076                 |   rrmovq %rdi, %rsi
+0x023: 2007                 |   rrmovq %rax, %rdi
+
+0x025: 30f80000000000000000 |   irmovq 0, count(%r8)    # set count
+0x02f: 30f40002000000000000 |   irmovq 0x200, %rsp      # set stack
+0x039: 804800000000000000   | 	call gcd		# run gcd func
+0x042: 00                   | 	halt			# end
+
+0x048:                      |   gcd:		
+0x048: 2070                 | 	rrmovq %rdi,%rax    # store old %rdi, or ret %rax
+0x04a: 6b76                 | 	mod %rdi,%rsi	    # %rsi = %rsi mod %rdi
+0x04c: 2067                 | 	rrmovq %rsi,%rdi    # %rdi = new %rsi = %rsi mod %rdi
+0x04e: 2006                 | 	rrmovq %rax,%rsi	# %rsi = old %rdi
+0x050: c08f                 | 	incq %r8            # count++
+0x052: f077                 |   testq %rdi, %rdi    # %rdi == 0?
+0x054: 744800000000000000   |   jne gcd             #continue
+0x05d: 90                   |   ret                 #ret
+
+                            |   # stack
+0x200:                      |   .pos 0x200		
+0x200:                      |   stack:	 
